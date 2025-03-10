@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Team Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .navbar {
+            background-color: #007bff;
+            padding: 10px;
+            text-align: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 5px;
+            display: inline-block;
+        }
+        .navbar a:hover {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="{% url 'sales_home' %}">Dashboard</a>
+        <a href="{% url 'enroll_student' %}">Enroll Student</a>
+        <a href="{% url 'view_pending_payments' %}">Pending Payments</a>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+
+    <h1>Welcome, {{ request.user.get_full_name }}!</h1>
+    <p>This is the home page for the Sales Team.</p>
+
+</body>
+</html>
