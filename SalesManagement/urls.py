@@ -18,11 +18,14 @@ from django.contrib import admin
 from django.urls import path,include
 from django.contrib.auth import views as auth_views
 from accounts.views import *
+from sales.views import CustomLoginView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('sales/', include('sales.urls')),
     path('sales_admin/', include('accounts.urls')),
     path('', home, name='home'),
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+path('logout/', user_logout, name='logout'),
+    path('login/', CustomLoginView.as_view(template_name='login.html'), name='login'),
+    # path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 ]

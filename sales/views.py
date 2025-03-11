@@ -3,30 +3,58 @@ from decimal import Decimal
 # Create your views here.
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-
-@login_required
-def sales_home(request):
-    return render(request, 'sales/home.html')
-
-
-@login_required
-def admin_dashboard(request):
-    if request.user.role != 'admin':
-        return render(request, '403.html')  # Unauthorized access
-    return render(request, 'admin_dashboard.html')
-
-# @login_required
-# def sales_dashboard(request):
-#     if request.user.role != 'sales':
-#         return render(request, '403.html')  # Unauthorized access
-#     return render(request, 'sales_dashboard.html')
-
-
+from django.urls import reverse
+from django.shortcuts import redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Student, Payment, PendingPayment, TrainingClass, SalesPerson
 from django.db.models import Sum
+
+
+@login_required
+def sales_home(request):
+    return render(request, 'sales/home.html')
+
+from decimal import Decimal
+import json
+from django.shortcuts import render
+from django.db.models import Sum
+@login_required
+def admin_dashboard(request):
+    total_students = Student.objects.count()
+    total_collected = Payment.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or Decimal(0)
+    total_pending = PendingPayment.objects.aggregate(Sum('due_amount'))['due_amount__sum'] or Decimal(0)
+
+    sales_data = SalesPerson.objects.annotate(total_collection=Sum('payment__amount_paid'))
+
+    salespersons = [sales.user.get_full_name() or sales.user.username for sales in sales_data]
+    collections = [float(sales.total_collection or 0) for sales in sales_data]  # Convert to float
+
+    context = {
+        "total_students": total_students,
+        "total_collected": float(total_collected),  # Convert Decimal to float
+        "total_pending": float(total_pending),  # Convert Decimal to float
+        "sales_data": sales_data,
+        "salespersons_json": json.dumps(salespersons),
+        "collections_json": json.dumps(collections),
+    }
+
+    return render(request, "admin_dashboard.html", context)
+
+
+from django.contrib.auth.views import LoginView
+class CustomLoginView(LoginView):
+    def get_success_url(self):
+        user = self.request.user
+        if user.role == 'sales':  # Check if user is in Sales Team
+            return reverse('sales_dashboard')  # Change to your actual sales dashboard URL name
+        elif user.role == 'admin':  # Check if user is an Admin
+            return reverse('admin_dashboard')  # Change to your actual admin dashboard URL name
+        else:
+            return reverse('home')  # Fallback URL (optional)
+
+
 
 
 # Ensure only salespersons can access

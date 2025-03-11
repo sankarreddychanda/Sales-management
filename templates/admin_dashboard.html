@@ -1,11 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h2>Admin Dashboard</h2>
-<p>Welcome, Admin! Manage sales data and users here.</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Admin Dashboard</h2>
+
+    <!-- Summary Cards -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Total Students</h5>
+                    <h3>{{ total_students }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Collection</h5>
+                    <h3>${{ total_collected }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5>Total Pending Amount</h5>
+                    <h3>${{ total_pending }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Collection Table -->
+    <div class="mt-4">
+        <h4>Salesperson Collections</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Salesperson</th>
+                    <th>Total Collection</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sales in sales_data %}
+                <tr>
+                    <td>{{ sales.user.get_full_name|default:sales.user.username }}</td>
+                    <td>${{ sales.total_collection|default:"0.00" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Chart -->
+    <div class="mt-4">
+        <h4>Salesperson Collection Graph</h4>
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <!-- JSON Data (Safe Embedding) -->
+    <script id="salespersons-data" type="application/json">{{ salespersons_json|safe }}</script>
+    <script id="collections-data" type="application/json">{{ collections_json|safe }}</script>
+
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('salesChart').getContext('2d');
+
+        // Retrieve JSON Data from <script> tag
+        var salespersons = JSON.parse(document.getElementById('salespersons-data').textContent);
+        var collections = JSON.parse(document.getElementById('collections-data').textContent);
+
+        var salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: salespersons,
+                datasets: [{
+                    label: 'Total Collection ($)',
+                    data: collections,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        console.log("Salespersons:", salespersons);
+        console.log("Collections:", collections);
+    });
+</script>
+{% endblock %}
