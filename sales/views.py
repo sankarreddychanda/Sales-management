@@ -73,7 +73,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from .models import SalesPerson, Student, Payment, PendingPayment
-
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 @login_required
 @sales_required
 def sales_dashboard(request):
@@ -118,7 +120,15 @@ def enroll_student(request):
             salesperson=salesperson,
             total_fees=total_fees,
         )
-        messages.success(request, f"Student {name} enrolled successfully!")
+        subject = "Enrollment Confirmation"
+        message = f"Hello {name},\n\nYou have been successfully enrolled in the {training_class.name} class. Your total fee is {total_fees}.\n\nBest regards,\nTraining Team"
+        from_email = "jsreddychanda123@gmail.com"  # Replace with your email
+        recipient_list = [email]
+
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+        messages.success(request, f"Student {name} enrolled successfully! A confirmation email has been sent.")
+        # messages.success(request, f"Student {name} enrolled successfully!")
         return redirect("sales_dashboard")
 
     classes = TrainingClass.objects.all()

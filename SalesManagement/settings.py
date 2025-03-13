@@ -129,3 +129,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 LOGIN_REDIRECT_URL = '/sales/'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "jsreddychanda123@gmail.com"
+EMAIL_HOST_PASSWORD = "jfhq qamu clia eqzj"  # Use an App Password instead of the actual password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
