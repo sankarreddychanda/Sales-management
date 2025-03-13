@@ -1,39 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sales Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">Sales Dashboard</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'enroll_student' %}">Enroll Student</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'view_pending_payments' %}">Pending Payments</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+{% block title %}Sales Dashboard | Sales Management{% endblock %}
 
-<!-- Dashboard Container -->
+{% block content %}
 <div class="container mt-4">
+    <!-- Welcome Message -->
     <div class="row">
         <div class="col-md-12">
             <h2 class="text-center">Welcome, {{ request.user.get_full_name }}!</h2>
@@ -43,18 +14,21 @@
 
     <!-- Summary Cards -->
     <div class="row text-center">
+        <!-- Total Collected -->
         <div class="col-md-4">
             <div class="card shadow-sm p-3 mb-3 bg-white rounded">
                 <h4 class="text-success">Total Collected</h4>
                 <p class="fs-3">₹{{ total_collected }}</p>
             </div>
         </div>
+        <!-- Pending Payments -->
         <div class="col-md-4">
             <div class="card shadow-sm p-3 mb-3 bg-white rounded">
                 <h4 class="text-warning">Pending Payments</h4>
                 <p class="fs-3">{{ pending_payments.count }}</p>
             </div>
         </div>
+        <!-- Students Enrolled -->
         <div class="col-md-4">
             <div class="card shadow-sm p-3 mb-3 bg-white rounded">
                 <h4 class="text-primary">Students Enrolled</h4>
@@ -83,18 +57,16 @@
                         <td>{{ student.name }}</td>
                         <td>{{ student.training_class.name }}</td>
                         <td>{{ student.phone }}</td>
-                       <td>
-    {% if student in fully_paid_students %}
-        <span class="badge bg-success">Paid</span>
-    {% else %}
-        <span class="badge bg-danger">Pending</span>
-    {% endif %}
-</td>
-
+                        <td>
+                            {% if student in fully_paid_students %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-danger">Pending</span>
+                            {% endif %}
+                        </td>
                         <td>
                             <a href="{% url 'record_payment' student.id %}" class="btn btn-sm btn-primary">Record Payment</a>
                             <a href="{% url 'create_pending_payment' student.id %}" class="btn btn-warning btn-sm">Set Pending Payment</a>
-
                         </td>
                     </tr>
                     {% empty %}
@@ -136,11 +108,5 @@
             </ul>
         </div>
     </div>
-
 </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+{% endblock %}

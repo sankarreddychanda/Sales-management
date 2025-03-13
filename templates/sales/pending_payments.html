@@ -1,93 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pending Payments</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            width: 50%;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h2 {
-            color: #333;
-            text-align: center;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            background: #ffcccc;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #a30000;
-        }
-
-        .no-payments {
-            background: #dff0d8;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #2d702d;
-        }
-
-        .back-btn {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .back-btn a {
-            text-decoration: none;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .back-btn a:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h2>Pending Payments</h2>
-
-        {% if pending_payments %}
-            <ul>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Pending Payments</h2>
+    {% if pending_payments %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Due Amount</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for payment in pending_payments %}
-                    <li>{{ payment.student.name }} - ₹{{ payment.due_amount }} pending</li>
+                    <tr>
+                        <td>{{ payment.student.name }}</td>
+                        <td>${{ payment.due_amount }}</td>
+                    </tr>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p class="no-payments">No pending payments.</p>
-        {% endif %}
-
-        <div class="back-btn">
-            <a href="{% url 'sales_dashboard' %}">← Back to Dashboard</a>
-        </div>
-    </div>
-
-</body>
-</html>
+            </tbody>
+        </table>
+    {% else %}
+        <p>No pending payments.</p>
+    {% endif %}
+</div>
+{% endblock %}

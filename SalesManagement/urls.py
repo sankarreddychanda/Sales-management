@@ -22,10 +22,10 @@ from sales.views import CustomLoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('sales/', include('sales.urls')),
-    path('sales_admin/', include('accounts.urls')),
-    path('', home, name='home'),
-path('logout/', user_logout, name='logout'),
-    path('login/', CustomLoginView.as_view(template_name='login.html'), name='login'),
+    path('', include('sales.urls')),
+    path('', include('accounts.urls')),
+    # path('', home, name='home'),
+    # path('logout/', user_logout, name='logout'),
+    # path('login/', CustomLoginView.as_view(template_name='login.html'), name='login'),
     # path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 ]

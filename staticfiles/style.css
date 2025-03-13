@@ -1,0 +1,20 @@
+/* Custom styles for the home page */
+.display-4 {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.lead {
+    font-size: 1.25rem;
+    color: #34495e;
+}
+
+.btn-lg {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}

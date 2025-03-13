@@ -1,14 +1,11 @@
 from django.db import models
 from django.conf import settings
 
-
 # Salesperson Model (User model will act as Salesperson)
 class SalesPerson(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
     def __str__(self):
         return self.user.get_full_name() or self.user.username
-
 
 # Class Model
 class TrainingClass(models.Model):
@@ -34,7 +31,6 @@ class Student(models.Model):
     def __str__(self):
         return self.name
 
-
 # Payment Model
 class Payment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -45,24 +41,28 @@ class Payment(models.Model):
     def __str__(self):
         return f"{self.student.name} - {self.amount_paid}"
 
-from django.utils.timezone import now
+from django.db import models
 from django.db.models import Sum
+from django.utils.timezone import now
 
-# Pending Payment Model
 class PendingPayment(models.Model):
     student = models.ForeignKey('Student', on_delete=models.CASCADE)
     due_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def save(self, *args, **kwargs):
-        # Ensure `total_fee` is not None
-        total_fee = self.student.total_fees if self.student.total_fees is not None else 0
+        # Ensure `total_fees` is not None
+        total_fees = self.student.total_fees if self.student.total_fees is not None else 0
 
-        # Ensure `amount_paid` is not None
-        amount_paid = Payment.objects.filter(student=self.student).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        # Calculate total amount paid by the student
+        total_paid = Payment.objects.filter(student=self.student).aggregate(total_paid=Sum('amount_paid'))['total_paid'] or 0
 
         # Calculate due amount
-        self.due_amount = total_fee - amount_paid
+        self.due_amount = total_fees - total_paid
 
+        # Save the instance
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.student.name} - ₹{self.due_amount} Pending"
 
 

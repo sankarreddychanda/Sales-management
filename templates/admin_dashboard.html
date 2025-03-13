@@ -1,68 +1,70 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | Sales Management{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-4">
     <h2>Admin Dashboard</h2>
 
     <!-- Summary Cards -->
-    <div class="row">
+    <div class="row text-center">
+        <!-- Total Students -->
         <div class="col-md-4">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h5>Total Students</h5>
-                    <h3>{{ total_students }}</h3>
-                </div>
+            <div class="card shadow-sm p-3 mb-3 bg-white rounded">
+                <h4 class="text-primary">Total Students</h4>
+                <p class="fs-3">{{ total_students }}</p>
             </div>
         </div>
+        <!-- Total Collected -->
         <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5>Total Collection</h5>
-                    <h3>${{ total_collected }}</h3>
-                </div>
+            <div class="card shadow-sm p-3 mb-3 bg-white rounded">
+                <h4 class="text-success">Total Collected</h4>
+                <p class="fs-3">₹{{ total_collected }}</p>
             </div>
         </div>
+        <!-- Total Pending -->
         <div class="col-md-4">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <h5>Total Pending Amount</h5>
-                    <h3>${{ total_pending }}</h3>
-                </div>
+            <div class="card shadow-sm p-3 mb-3 bg-white rounded">
+                <h4 class="text-warning">Total Pending</h4>
+                <p class="fs-3">₹{{ total_pending }}</p>
             </div>
         </div>
     </div>
 
-    <!-- Sales Collection Table -->
-    <div class="mt-4">
-        <h4>Salesperson Collections</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Salesperson</th>
-                    <th>Total Collection</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sales in sales_data %}
-                <tr>
-                    <td>{{ sales.user.get_full_name|default:sales.user.username }}</td>
-                    <td>${{ sales.total_collection|default:"0.00" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Sales Collection Graph -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h3>Sales Collection by Salesperson</h3>
+            <canvas id="salesChart"></canvas>
+        </div>
     </div>
 
-    <!-- Chart -->
-    <div class="mt-4">
-        <h4>Salesperson Collection Graph</h4>
-        <canvas id="salesChart"></canvas>
+    <!-- Sales Data Table -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h3>Sales Data</h3>
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Salesperson</th>
+                        <th>Total Collected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sales in sales_data %}
+                    <tr>
+                        <td>{{ sales.user.get_full_name|default:sales.user.username }}</td>
+                        <td>₹{{ sales.total_collection|default:"0.00" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center text-muted">No sales data available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <!-- JSON Data (Safe Embedding) -->
-    <script id="salespersons-data" type="application/json">{{ salespersons_json|safe }}</script>
-    <script id="collections-data" type="application/json">{{ collections_json|safe }}</script>
-
 </div>
 
 <!-- Chart.js Script -->
@@ -70,18 +72,13 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var ctx = document.getElementById('salesChart').getContext('2d');
-
-        // Retrieve JSON Data from <script> tag
-        var salespersons = JSON.parse(document.getElementById('salespersons-data').textContent);
-        var collections = JSON.parse(document.getElementById('collections-data').textContent);
-
         var salesChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: salespersons,
+                labels: {{ salespersons|safe }},
                 datasets: [{
-                    label: 'Total Collection ($)',
-                    data: collections,
+                    label: 'Total Collection (₹)',
+                    data: {{ collections|safe }},
                     backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
@@ -96,9 +93,6 @@
                 }
             }
         });
-
-        console.log("Salespersons:", salespersons);
-        console.log("Collections:", collections);
     });
 </script>
 {% endblock %}
